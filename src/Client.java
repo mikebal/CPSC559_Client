@@ -19,7 +19,7 @@ public class Client {
 		// attempt to connect to the server
 		try {
 			// create a socket
-			clientSocket = new Socket("localhost", 9000);
+			clientSocket = new Socket("localhost", 9001);
 
 			// get the input and output streams
 			os = clientSocket.getOutputStream();

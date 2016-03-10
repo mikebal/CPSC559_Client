@@ -37,8 +37,7 @@ public class Client {
 			e.printStackTrace();
 		}
 
-		System.out.println("Starting client upload/download server at: "
-				+ IPaddress + ":" + openPort);
+		System.out.println("Starting client upload/download server at: " + IPaddress + ":" + openPort);
 
 		do {
 			try {
@@ -48,8 +47,7 @@ public class Client {
 				// get the input and output streams
 				os = clientSocket.getOutputStream();
 				is = clientSocket.getInputStream();
-				BufferedReader in = new BufferedReader(
-						new InputStreamReader(is));
+				BufferedReader in = new BufferedReader(new InputStreamReader(is));
 				PrintWriter out = new PrintWriter(os, true /* autoflush */);
 				Scanner userIn = new Scanner(System.in);
 				// close connection once tracker information has been delivered
@@ -58,21 +56,19 @@ public class Client {
 
 				// receive tracker info
 				String trackerServerList = in.readLine();
-				System.out.println(trackerServerList);
+				System.out.println("List of possible tracker servers:");
 				// parse tracker info
 				String[] parsedRedirectInput = trackerServerList.split("'#");
 				int trackerAmount = parsedRedirectInput.length / 4;
 				int offset = 0;
 				for (int i = 0; i < trackerAmount; i++) {
 					// create tracker info per group of 4;
-					TrackerInfo tr = new TrackerInfo(
-							parsedRedirectInput[offset]);
-					int tracerlocationAmount = Integer
-							.parseInt(parsedRedirectInput[offset + 1]);
+					TrackerInfo tr = new TrackerInfo(parsedRedirectInput[offset]);
+					int tracerlocationAmount = Integer.parseInt(parsedRedirectInput[offset + 1]);
 					// for the second variable (location amount) add to tracker
 					for (int x = 0; x < tracerlocationAmount; x++) {
-						tr.addLocation(parsedRedirectInput[offset + 2], Integer
-								.parseInt(parsedRedirectInput[offset + 3]));
+						tr.addLocation(parsedRedirectInput[offset + 2],
+								Integer.parseInt(parsedRedirectInput[offset + 3]));
 						offset += 2;
 					}
 
@@ -89,12 +85,10 @@ public class Client {
 				clientSocket = null;
 
 				for (int i = 0; i < ti.size(); i++) {
-					System.out.println(i + 1 + ".    "
-							+ ti.get(i).getGroupName());
+					System.out.println(i + 1 + ".    " + ti.get(i).getGroupName());
 				}
 
-				System.out
-						.println("Please enter the server (integer) that you wish to connect too:");
+				System.out.println("Please enter the server (integer) that you wish to connect too:");
 				userLine = userIn.nextLine();
 
 				int userChoice = Integer.parseInt(userLine);
@@ -102,52 +96,49 @@ public class Client {
 
 				try {
 					TrackerInfo choice = ti.get(userChoice);
-					String cachedHostname = choice.getLocation(0).hostName;
-					int cachedPort = choice.getLocation(0).port;
+					String cachedHostname = choice.getLocation(0).getHostname();
+					int cachedPort = choice.getLocation(0).getPort();
+
+					boolean firstConnection = true;
 
 					do {
+						System.out.println("Enter command");
+						while (!userIn.hasNext()) {
+
+						}
+						userLine = userIn.nextLine();
 						clientSocket = new Socket(cachedHostname, cachedPort);
 						os = clientSocket.getOutputStream();
 						is = clientSocket.getInputStream();
 						out = new PrintWriter(os, true /* autoflush */);
 						in = new BufferedReader(new InputStreamReader(is));
 
-						// tell server that they have connected to the server
-						out.println(IPaddress + "'#" + openPort);
-						out.println("show user list");
-						//System.out.println(in.readLine());
+						if (firstConnection) {
+							out.println(IPaddress + "'#" + openPort);
+							out.println("joining");
+							/**
+							 * handle users sending multiple add requests for the files that they own
+							 */
+							firstConnection = false;
+						}
 
-						System.out.println("Enter command to send to the SERVER");
-						// do {
-						userLine = userIn.nextLine();
-						//
 						String[] input = userLine.split(" ");
-						//
-//						if (input[0].equalsIgnoreCase("get")) {
-//							System.out.println("Requesting file " + input[1]
-//									+ " from server");
-//							out.println("existing'#" + input[0] + "'#"
-//									+ input[1]);
-//							// do something with client-client connection to
-//							// retrieve
-//							// file
-//						} else if (input[0].equalsIgnoreCase("Add")) {
-//							if (ci.addFile(input[1])) {
-//								System.out.println("Broadcasting file "
-//										+ input[1] + " to server");
-//								out.println("existing'#" + input[0] + "'#"
-//										+ input[1]);
-//							}
-//						} else if (input[0].equalsIgnoreCase("bye")) {
-//							System.out.println("Leaving current group");
-//							out.println(ci.retrieveIdentifier() + "#" + "BYE");
-//						} else if (input[0].equalsIgnoreCase("file-list")) {
-//							System.out.println("Retrieving tracker file list");
-//							out.println(ci.retrieveIdentifier() + "#"
-//									+ "FILE-LIST");
-//						} else if (!input[0].equalsIgnoreCase("exit")) {
-//							System.err.println("Unrecognized command");
-//						}
+
+						if (input[0].equalsIgnoreCase("get")) {
+							System.out.println("Requesting file " + input[1] + " from server");
+							out.println(input[0] + "'#" + input[1]);
+							// do something with client-client connection to
+							// retrieve
+							// file
+							System.out.println(in.readLine());
+						} else if (input[0].equalsIgnoreCase("add")) {
+							if (ci.addFile(input[1])) {
+								System.out.println("Broadcasting file " + input[1] + " to server");
+								out.println("add'#" + input[1] + "'#"+ IPaddress + "'#" + openPort);
+							}
+						} else if (!input[0].equalsIgnoreCase("exit")) {
+							System.err.println("Unrecognized command");
+						}
 
 						clientSocket.close();
 						os.close();
@@ -156,8 +147,7 @@ public class Client {
 						os = null;
 						is = null;
 
-					} while (!userLine.equalsIgnoreCase("exit")
-							|| !userLine.equalsIgnoreCase("leave"));
+					} while (!userLine.equalsIgnoreCase("exit") || !userLine.equalsIgnoreCase("leave"));
 				} catch (IOException ioe) {
 					System.err.println("Couldn't connect to tracker");
 					System.exit(0);

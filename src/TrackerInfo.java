@@ -4,33 +4,38 @@ import java.util.ArrayList;
 public class TrackerInfo {
 
 	private String groupName;
-	private ArrayList<trackerLocations> tl = new ArrayList<trackerLocations>();
-	
-	class trackerLocations{
-		public String hostName;
-		public int port;	
-		
-		trackerLocations(String hostname, int port){
-			this.hostName = hostname;
-			this.port =  port;
-		}
-	}
+	private ArrayList<Location> tl = new ArrayList<Location>();
+	private int count;
+
 	private String hostName;
 	private int port;
 	
 	TrackerInfo(String gn){
 		this.groupName = gn;
+		this.count = 0;
+	}
+	
+	public int returnCount(){
+		return this.count;
+	}
+	
+	public boolean incrementCount(){
+		this.count +=1;
+		if (tl.size() > count){
+			return false;
+		}
+		return true;
 	}
 	
 	public void addLocation(String hostname, int port){
-		tl.add(new trackerLocations(hostname, port));
+		tl.add(new Location(hostname, port));
 	}
 	
 	public String getGroupName() {
 		return groupName;
 	}
 	
-	public trackerLocations getLocation(int number){
+	public Location getLocation(int number){
 		
 		if (tl.size() == 1)
 			return tl.get(0);

@@ -1,161 +1,84 @@
 import java.io.*;
-import java.net.*;
 import java.util.*;
 
 public class Client {
 
-	public static void main(String[] args) {
-		Socket clientSocket = null;
-		InputStream is = null;
-		OutputStream os = null;
+    public static void main(String[] args) {
+	TrackerManager tm = new TrackerManager();
+	Parser parse = new Parser();
+	NetworkManager nm = new NetworkManager();
+	FileManager fm = new FileManager();
 
-		String id = null;
-		if (args.length == 0) {
-			id = "JohnDoe";
-		} else
-			id = args[0];
-		ClientInfo ci = new ClientInfo(id);
-		String userLine = null;
+	String userLine = null;
+	CachedValues cached = new CachedValues();
+	CommandHandler ch = new CommandHandler(nm, fm, parse);
 
-		MultiThreadedServer server = new MultiThreadedServer(9000);
-		new Thread(server).start();
+	do {
+	    try {
+		nm.connect(args[0], Integer.parseInt(args[1]));
 
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		cached.updateRedirect(args[0], Integer.parseInt(args[1]));
 
-		int openPort = server.getServerPort();
+		nm.out.println("New client");
 
-		String IPaddress = "";
-		try {
-			InetAddress thisIp = InetAddress.getLocalHost();
-			IPaddress = thisIp.getHostAddress();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		String trackerServerList = nm.in.readLine();
 
-		System.out.println("Starting client upload/download server at: " + IPaddress + ":" + openPort);
+		parse.parseTracker(tm, trackerServerList);
 
+		nm.closeConnection();
+
+		tm.printTrackers();
+
+		System.out.println("Please enter the server (integer) that you wish to connect too:");
+		Scanner userIn = new Scanner(System.in);
+		userLine = userIn.nextLine();
+
+		int userChoice = Integer.parseInt(userLine);
+		userChoice--;
+
+		TrackerInfo choice = tm.getTrackers().get(userChoice);
+		boolean firstConnection = true;
 		do {
-			try {
-				// create a socket
-				// connect it to redirect
-				clientSocket = new Socket("localhost", 9000);
-				// get the input and output streams
-				os = clientSocket.getOutputStream();
-				is = clientSocket.getInputStream();
-				BufferedReader in = new BufferedReader(new InputStreamReader(is));
-				PrintWriter out = new PrintWriter(os, true /* autoflush */);
-				Scanner userIn = new Scanner(System.in);
-				// close connection once tracker information has been delivered
-				out.println("New client");
-				ArrayList<TrackerInfo> ti = new ArrayList<TrackerInfo>();
+		    try {
 
-				// receive tracker info
-				String trackerServerList = in.readLine();
-				System.out.println("List of possible tracker servers:");
-				// parse tracker info
-				String[] parsedRedirectInput = trackerServerList.split("'#");
-				int trackerAmount = parsedRedirectInput.length / 4;
-				int offset = 0;
-				for (int i = 0; i < trackerAmount; i++) {
-					// create tracker info per group of 4;
-					TrackerInfo tr = new TrackerInfo(parsedRedirectInput[offset]);
-					int tracerlocationAmount = Integer.parseInt(parsedRedirectInput[offset + 1]);
-					// for the second variable (location amount) add to tracker
-					for (int x = 0; x < tracerlocationAmount; x++) {
-						tr.addLocation(parsedRedirectInput[offset + 2],
-								Integer.parseInt(parsedRedirectInput[offset + 3]));
-						offset += 2;
-					}
+			cached.updateTracker(choice.getLocation(choice.returnCount()).getHostname(),
+				choice.getLocation(choice.returnCount()).getPort());
 
-					ti.add(tr);
-					offset++;
-				}
-				clientSocket.close();
-				os.close();
-				is.close();
-				os = null;
-				is = null;
-				in.close();
-				out.close();
-				clientSocket = null;
+			System.out.println("Enter command");
+			while (!userIn.hasNext()) {
 
-				for (int i = 0; i < ti.size(); i++) {
-					System.out.println(i + 1 + ".    " + ti.get(i).getGroupName());
-				}
-
-				System.out.println("Please enter the server (integer) that you wish to connect too:");
-				userLine = userIn.nextLine();
-
-				int userChoice = Integer.parseInt(userLine);
-				userChoice--;
-
-				try {
-					TrackerInfo choice = ti.get(userChoice);
-					String cachedHostname = choice.getLocation(0).getHostname();
-					int cachedPort = choice.getLocation(0).getPort();
-
-					boolean firstConnection = true;
-
-					do {
-						System.out.println("Enter command");
-						while (!userIn.hasNext()) {
-
-						}
-						userLine = userIn.nextLine();
-						clientSocket = new Socket(cachedHostname, cachedPort);
-						os = clientSocket.getOutputStream();
-						is = clientSocket.getInputStream();
-						out = new PrintWriter(os, true /* autoflush */);
-						in = new BufferedReader(new InputStreamReader(is));
-
-						if (firstConnection) {
-							out.println(IPaddress + "'#" + openPort);
-							out.println("joining");
-							/**
-							 * handle users sending multiple add requests for the files that they own
-							 */
-							firstConnection = false;
-						}
-
-						String[] input = userLine.split(" ");
-
-						if (input[0].equalsIgnoreCase("get")) {
-							System.out.println("Requesting file " + input[1] + " from server");
-							out.println(input[0] + "'#" + input[1]);
-							// do something with client-client connection to
-							// retrieve
-							// file
-							System.out.println(in.readLine());
-						} else if (input[0].equalsIgnoreCase("add")) {
-							if (ci.addFile(input[1])) {
-								System.out.println("Broadcasting file " + input[1] + " to server");
-								out.println("add'#" + input[1] + "'#"+ IPaddress + "'#" + openPort);
-							}
-						} else if (!input[0].equalsIgnoreCase("exit")) {
-							System.err.println("Unrecognized command");
-						}
-
-						clientSocket.close();
-						os.close();
-						is.close();
-						clientSocket = null;
-						os = null;
-						is = null;
-
-					} while (!userLine.equalsIgnoreCase("exit") || !userLine.equalsIgnoreCase("leave"));
-				} catch (IOException ioe) {
-					System.err.println("Couldn't connect to tracker");
-					System.exit(0);
-				}
-				System.out.println("Terminating program");
-			} catch (IOException e) {
-				System.err.println("Unable to connect to tracker sever");
 			}
-		} while (userLine.equalsIgnoreCase("exit"));
-	} // attempt to connect to the server
+
+			userLine = userIn.nextLine();
+			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
+
+			if (firstConnection) {
+			    nm.out.println(nm.IPaddress + "'#" + nm.openPort);
+			    nm.out.println("joining");
+			    firstConnection = false;
+			}
+
+			String[] input = userLine.split(" ");
+
+			ch.handleCommand(input);
+
+			nm.closeConnection();
+
+		    } catch (IOException ioe) {
+			System.err.println("Couldn't connect to tracker, trying next in group");
+			if (!choice.incrementCount()) {
+			    System.err.println("No more trackers in group");
+			    break;
+			}
+		    }
+		} while (!userLine.equalsIgnoreCase("exit") || !userLine.equalsIgnoreCase("leave"));
+		userIn.close();
+		System.out.println("Terminating program");
+	    } catch (IOException e) {
+		System.err.println("Unable to connect to tracker sever");
+	    }
+
+	} while (userLine.equalsIgnoreCase("exit"));
+
+    }
 }

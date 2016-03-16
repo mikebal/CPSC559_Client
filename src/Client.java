@@ -101,28 +101,39 @@ public class Client {
 
 					boolean firstConnection = true;
 
+					clientSocket = new Socket(cachedHostname, cachedPort);
+					os = clientSocket.getOutputStream();
+					is = clientSocket.getInputStream();
+					out = new PrintWriter(os, true /* autoflush */);
+					in = new BufferedReader(new InputStreamReader(is));
+
+					if (firstConnection) {
+						out.println("new-client-join-request" +"'#" + IPaddress + "'#" + openPort);
+						/**
+						* handle users sending multiple add requests for the files that they own
+						*/
+						firstConnection = false;
+					}
+
 					do {
 						System.out.println("Enter command");
 						while (!userIn.hasNext()) {
 
 						}
 						userLine = userIn.nextLine();
+						String[] input = userLine.split(" ");
+						if (input[0].equalsIgnoreCase("exit"))
+						{
+							if(clientSocket != null)
+								clientSocket.close();
+							System.exit(0);
+						}
+
 						clientSocket = new Socket(cachedHostname, cachedPort);
 						os = clientSocket.getOutputStream();
 						is = clientSocket.getInputStream();
 						out = new PrintWriter(os, true /* autoflush */);
-						in = new BufferedReader(new InputStreamReader(is));
-
-						if (firstConnection) {
-							out.println(IPaddress + "'#" + openPort);
-							out.println("joining");
-							/**
-							 * handle users sending multiple add requests for the files that they own
-							 */
-							firstConnection = false;
-						}
-
-						String[] input = userLine.split(" ");
+						in = new BufferedReader(new InputStreamReader(is));				
 
 						if (input[0].equalsIgnoreCase("get")) {
 							System.out.println("Requesting file " + input[1] + " from server");
@@ -139,6 +150,7 @@ public class Client {
 						} else if (!input[0].equalsIgnoreCase("exit")) {
 							System.err.println("Unrecognized command");
 						}
+
 
 						clientSocket.close();
 						os.close();

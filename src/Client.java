@@ -147,7 +147,14 @@ public class Client {
 								System.out.println("Broadcasting file " + input[1] + " to server");
 								out.println("add'#" + input[1] + "'#"+ IPaddress + "'#" + openPort);
 							}
-						} else if (!input[0].equalsIgnoreCase("exit")) {
+						} 
+						else if (input[0].equalsIgnoreCase("leave")) {
+							System.out.println("Leaving server");
+							out.println("leave'#" + IPaddress + "'#" + openPort);
+							
+						}
+
+						else if (!input[0].equalsIgnoreCase("exit")) {
 							System.err.println("Unrecognized command");
 						}
 

@@ -12,7 +12,7 @@ public class Client {
 	String userLine = null;
 	CachedValues cached = new CachedValues();
 	CommandHandler ch = new CommandHandler(nm, fm, parse);
-
+	
 	do {
 	    try {
 		nm.connect(args[0], Integer.parseInt(args[1]));

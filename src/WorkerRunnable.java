@@ -31,6 +31,23 @@ public class WorkerRunnable implements Runnable {
 
 		System.out.println("Client requested file: " + receivedMSG);
 
+		File file = new File(receivedMSG);
+		FileInputStream fis = new FileInputStream(file);
+		byte[] mybytearray = new byte[(int) file.length()];
+
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		bis.read(mybytearray, 0, mybytearray.length);
+
+		out.println(file.length());
+
+		bis = new BufferedInputStream(fis);
+		bis.read(mybytearray, 0, mybytearray.length);
+
+		System.out.println("Sending " + receivedMSG + "(" + mybytearray.length + " bytes)");
+		output.write(mybytearray, 0, mybytearray.length);
+		output.flush();
+		System.out.println("Done.");
+
 	    } catch (IOException e) {
 		System.out.println("Read failed");
 		System.exit(-1);

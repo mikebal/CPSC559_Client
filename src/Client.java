@@ -8,12 +8,18 @@ public class Client {
 		Socket clientSocket = null;
 		InputStream is = null;
 		OutputStream os = null;
+		int port = 9000;
+		String host = "localhost";
 
 		String id = null;
 		if (args.length == 0) {
 			id = "JohnDoe";
-		} else
+		} else if(args.length == 3)
+		{
 			id = args[0];
+			host = args[1];
+			port = Integer.parseInt(args[2]);
+		}
 		ClientInfo ci = new ClientInfo(id);
 		String userLine = null;
 
@@ -43,7 +49,7 @@ public class Client {
 			try {
 				// create a socket
 				// connect it to redirect
-				clientSocket = new Socket("localhost", 9000);
+				clientSocket = new Socket(host, port);
 				// get the input and output streams
 				os = clientSocket.getOutputStream();
 				is = clientSocket.getInputStream();

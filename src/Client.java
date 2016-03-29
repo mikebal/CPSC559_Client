@@ -53,10 +53,13 @@ public class Client {
 			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 
 			if (firstConnection) {
-			    nm.out.println(nm.IPaddress + "'#" + nm.openPort);
-			    nm.out.println("joining");
+			    nm.out.println(nm.IPaddress + "'#" + nm.openPort + "'#" + "joining");
 			    firstConnection = false;
+			    nm.closeConnection();
+			    Thread.sleep(1000);
 			}
+			
+			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 
 			String[] input = userLine.split(" ");
 
@@ -64,12 +67,17 @@ public class Client {
 
 			nm.closeConnection();
 
+			
+
 		    } catch (IOException ioe) {
 			System.err.println("Couldn't connect to tracker, trying next in group");
 			if (!choice.incrementCount()) {
 			    System.err.println("No more trackers in group");
 			    break;
 			}
+		    }
+		    catch(InterruptedException e){
+		    	e.printStackTrace();
 		    }
 		} while (!userLine.equalsIgnoreCase("exit") || !userLine.equalsIgnoreCase("leave"));
 		userIn.close();

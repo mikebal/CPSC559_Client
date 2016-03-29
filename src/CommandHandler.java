@@ -40,7 +40,7 @@ public class CommandHandler {
 			getFileList(input);
 
 		} else if (input[0].equals("leave")) {
-
+			n.out.println("leave'#" + n.IPaddress + "'#" + n.openPort);
 		} else if (!input[0].equalsIgnoreCase("exit")) {
 			System.err.println("Unrecognized command");
 		}

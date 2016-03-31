@@ -44,22 +44,34 @@ public class Client {
 			cached.updateTracker(choice.getLocation(choice.returnCount()).getHostname(),
 				choice.getLocation(choice.returnCount()).getPort());
 
+			
+			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
+
+			if (firstConnection) {
+			    nm.out.println(nm.IPaddress + "'#" + nm.openPort + "'#" + "joining");
+			    firstConnection = false;
+			    while(!nm.in.ready());
+			    String serverReply = nm.in.readLine();
+			    nm.closeConnection();
+			    if(serverReply.equals("refuse"))
+			    {
+			    	throw new IOException();
+			    }
+			    else
+			    	System.out.println("Successful connection to tracker");
+			    userLine = "";
+			}
+			else{
+
+
+			
+			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 			System.out.println("Enter command");
 			while (!userIn.hasNext()) {
 
 			}
 
 			userLine = userIn.nextLine();
-			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
-
-			if (firstConnection) {
-			    nm.out.println(nm.IPaddress + "'#" + nm.openPort + "'#" + "joining");
-			    firstConnection = false;
-			    nm.closeConnection();
-			    Thread.sleep(1000);
-			}
-			
-			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 
 			String[] input = userLine.split(" ");
 
@@ -67,6 +79,7 @@ public class Client {
 
 			nm.closeConnection();
 
+			}
 			
 
 		    } catch (IOException ioe) {
@@ -75,9 +88,9 @@ public class Client {
 			    System.err.println("No more trackers in group");
 			    break;
 			}
-		    }
-		    catch(InterruptedException e){
-		    	e.printStackTrace();
+			else{
+				firstConnection = true;
+			}
 		    }
 		} while (!userLine.equalsIgnoreCase("exit") || !userLine.equalsIgnoreCase("leave"));
 		userIn.close();

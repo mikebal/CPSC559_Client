@@ -21,28 +21,33 @@ public class CommandHandler {
 		this.p = parse;
 	}
 
-	public void handleCommand(String[] input) throws IOException {
-
-		if (input[0].equalsIgnoreCase("get")) {
-			if (getFile(input[1])) {
-				System.out.println("file retrieved");
+	public void handleCommand(String[] input) {
+		try {
+			if (input[0].equalsIgnoreCase("get")) {
+				if (getFile(input[1])) {
+					System.out.println("file retrieved");
+					addFile(input[1]);
+				} else
+					System.out.println("Unable to retrieve file");
+	
+			} else if (input[0].equalsIgnoreCase("add")) {
 				addFile(input[1]);
-			} else
-				System.out.println("Unable to retrieve file");
-
-		} else if (input[0].equalsIgnoreCase("add")) {
-			addFile(input[1]);
-
-		} else if (input[0].equals("showuserlist")) {
-			getUserList(input);
-
-		} else if (input[0].equals("getfilelist")) {
-			getFileList(input);
-
-		} else if (input[0].equals("leave")) {
-			n.out.println("leave'#" + n.IPaddress + "'#" + n.openPort);
-		} else if (!input[0].equalsIgnoreCase("exit")) {
-			System.err.println("Unrecognized command");
+	
+			} else if (input[0].equals("showuserlist")) {
+				getUserList(input);
+	
+			} else if (input[0].equals("getfilelist")) {
+				getFileList(input);
+	
+			} else if (input[0].equals("leave")) {
+				System.out.println("here");
+				n.out.println("leave'#" + n.IPaddress + "'#" + n.openPort);
+			} else if (!input[0].equalsIgnoreCase("exit")) {
+				System.err.println("Unrecognized command");
+			}
+		}
+		catch (IOException e){
+			
 		}
 
 	}
@@ -141,8 +146,11 @@ public class CommandHandler {
 					} catch (IOException e) {
 						System.err.println(e);
 						System.err.println("trying new client");
-						if (!toGet.incrementCount())
+						if (!toGet.incrementCount()) {
+							System.err.println("no more clients to connect to");
 							break;
+						}
+							
 					}
 				}
 			}
@@ -152,7 +160,7 @@ public class CommandHandler {
 
 		catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return false;
 

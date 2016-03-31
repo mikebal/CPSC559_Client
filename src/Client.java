@@ -4,10 +4,11 @@ import java.util.*;
 public class Client {
 
     public static void main(String[] args) {
-	TrackerManager tm = new TrackerManager();
+	TrackerManager tm;
 	Parser parse = new Parser();
 	NetworkManager nm = new NetworkManager();
 	FileManager fm = new FileManager();
+	Scanner userIn = new Scanner(System.in);
 
 	String userLine = null;
 	CachedValues cached = new CachedValues();
@@ -17,6 +18,8 @@ public class Client {
 	    try {
 		nm.connect(args[0], Integer.parseInt(args[1]));
 
+		tm = null;
+		tm = new TrackerManager();
 		cached.updateRedirect(args[0], Integer.parseInt(args[1]));
 
 		nm.out.println("New client");
@@ -30,7 +33,7 @@ public class Client {
 		tm.printTrackers();
 
 		System.out.println("Please enter the server (integer) that you wish to connect too:");
-		Scanner userIn = new Scanner(System.in);
+		//Scanner userIn = new Scanner(System.in);
 		userLine = userIn.nextLine();
 
 		int userChoice = Integer.parseInt(userLine);
@@ -41,6 +44,8 @@ public class Client {
 		do {
 		    try {
 
+		    userLine = "";	
+		    	
 			cached.updateTracker(choice.getLocation(choice.returnCount()).getHostname(),
 				choice.getLocation(choice.returnCount()).getPort());
 
@@ -48,7 +53,7 @@ public class Client {
 			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 
 			if (firstConnection) {
-			    nm.out.println(nm.IPaddress + "'#" + nm.openPort + "'#" + "joining");
+			    nm.out.println("new'#"+nm.IPaddress + "'#" + nm.openPort+"'#");
 			    firstConnection = false;
 			    while(!nm.in.ready());
 			    String serverReply = nm.in.readLine();
@@ -65,7 +70,7 @@ public class Client {
 
 
 			
-			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
+			//nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 			System.out.println("Enter command");
 			while (!userIn.hasNext()) {
 
@@ -81,6 +86,7 @@ public class Client {
 
 			}
 			
+		
 
 		    } catch (IOException ioe) {
 			System.err.println("Couldn't connect to tracker, trying next in group");
@@ -92,14 +98,17 @@ public class Client {
 				firstConnection = true;
 			}
 		    }
-		} while (!userLine.equalsIgnoreCase("exit") || !userLine.equalsIgnoreCase("leave"));
-		userIn.close();
-		System.out.println("Terminating program");
+		   
+		} while (!userLine.equalsIgnoreCase("exit") && !userLine.equalsIgnoreCase("leave"));
+		
+		
 	    } catch (IOException e) {
 		System.err.println("Unable to connect to tracker sever");
 	    }
-
-	} while (userLine.equalsIgnoreCase("exit"));
-
+	    System.out.println("Leaving tracker");
+	} while (!userLine.equalsIgnoreCase("exit"));
+	System.out.println("Terminating program");
+	userIn.close();
+	System.exit(0);
     }
 }

@@ -17,7 +17,7 @@ public class TrackerInfo {
 
     public boolean incrementCount() {
 	this.count += 1;
-	if (tl.size() < count) {
+	if (tl.size() <= count) {
 	    return false;
 	}
 	return true;

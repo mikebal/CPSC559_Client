@@ -10,29 +10,52 @@ public class Parser {
 
 	}
 
-	public void parseTracker(TrackerManager tm, String input) {
+	public void parseTracker(TrackerManager tm, String input){
 
 		String[] parsedRedirectInput = input.split(ARGUMENTSEPERATOR);
 
 		int count = 0;
+		boolean parsingPairs = false;
+		boolean parsingGroup = true;
+		boolean parsingNum = false;
+		String hostname = "";
+		int num = 0;
+		int numSoFar = 1;
+		int port = 0;
+		TrackerInfo tr = null;
 
-		while (count < (parsedRedirectInput.length - 1)) {
-			TrackerInfo tr = new TrackerInfo(parsedRedirectInput[count]);
-			count += 1;
-
-			int trackerCount = Integer.parseInt(parsedRedirectInput[count]);
-			for (int i = 0; i < trackerCount; i++) {
-
-				String hostname = parsedRedirectInput[count + 1];
-
-				int port = Integer.parseInt(parsedRedirectInput[count + 2]);
-
-				tr.addLocation(hostname, port);
-				count += 2;
-
+		for(int i = 0; i < parsedRedirectInput.length; i++){
+			if(parsingGroup)
+			{
+				tr = new TrackerInfo(parsedRedirectInput[i]);
+				parsingGroup = false;
+				parsingNum = true;
 			}
+			else if(parsingNum){
+				num = Integer.parseInt(parsedRedirectInput[i]);
+				parsingPairs = true;
+				parsingNum = false;
+			}
+			else if(parsingPairs){
+				if(i%2 == 0)
+					hostname = parsedRedirectInput[i];
+				else
+				{
+					port = Integer.parseInt(parsedRedirectInput[i]);
+					tr.addLocation(hostname, port);
 
-			tm.addTracker(tr);
+					if(numSoFar == num)
+					{
+						num = 0;
+						numSoFar = 1;
+						parsingPairs = false;
+						parsingGroup = true;
+						tm.addTracker(tr);
+					}
+					else
+						numSoFar = numSoFar + 1;
+				}
+			}
 		}
 	}
 

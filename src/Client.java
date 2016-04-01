@@ -34,6 +34,7 @@ public class Client {
 
 		System.out.println("Please enter the server (integer) that you wish to connect too:");
 		//Scanner userIn = new Scanner(System.in);
+		while(!userIn.hasNextLine());
 		userLine = userIn.nextLine();
 
 		int userChoice = Integer.parseInt(userLine);

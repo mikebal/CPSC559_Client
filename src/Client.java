@@ -51,9 +51,10 @@ public class Client {
 				choice.getLocation(choice.returnCount()).getPort());
 
 			
-			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
+			
 
 			if (firstConnection) {
+			    nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 			    nm.out.println("new'#"+nm.IPaddress + "'#" + nm.openPort+"'#");
 			    firstConnection = false;
 			    while(!nm.in.ready());
@@ -71,7 +72,7 @@ public class Client {
 
 
 			
-			//nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
+			
 			System.out.println("Enter command");
 			while (!userIn.hasNext()) {
 
@@ -81,6 +82,8 @@ public class Client {
 
 			String[] input = userLine.split(" ");
 
+			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
+			
 			ch.handleCommand(input);
 
 			nm.closeConnection();

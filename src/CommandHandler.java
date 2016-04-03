@@ -11,177 +11,180 @@ import java.net.Socket;
 
 public class CommandHandler {
 
-	private NetworkManager n;
-	private FileManager f;
-	private Parser p;
+    private NetworkManager n;
+    private FileManager f;
+    private Parser p;
 
-	public CommandHandler(NetworkManager nm, FileManager fm, Parser parse) {
-		this.n = nm;
-		this.f = fm;
-		this.p = parse;
-	}
+    public CommandHandler(NetworkManager nm, FileManager fm, Parser parse) {
+	this.n = nm;
+	this.f = fm;
+	this.p = parse;
+    }
 
-	public void handleCommand(String[] input) {
-		try {
-			if (input[0].equalsIgnoreCase("get")) {
-				if (getFile(input[1])) {
-					System.out.println("file retrieved");
-					addFile(input[1]);
-				} else
-					System.out.println("Unable to retrieve file");
-	
-			} else if (input[0].equalsIgnoreCase("add")) {
-				addFile(input[1]);
-	
-			} else if (input[0].equals("showuserlist")) {
-				getUserList(input);
-	
-			} else if (input[0].equals("getfilelist")) {
-				getFileList(input);
-	
-			} else if (input[0].equals("leave")) {
-				System.out.println("here");
-				n.out.println("leave'#" + n.IPaddress + "'#" + n.openPort);
-			} else if (!input[0].equalsIgnoreCase("exit")) {
-				System.err.println("Unrecognized command");
-			}
-		}
-		catch (IOException e){
-			
-		}
+    public void handleCommand(String[] input) {
+	try {
+	    if (input[0].equalsIgnoreCase("get")) {
+		if (getFile(input[1])) {
+		    System.out.println("file retrieved");
+
+		} else
+		    System.out.println("Unable to retrieve file");
+
+	    } else if (input[0].equalsIgnoreCase("add")) {
+		addFile(input[1]);
+
+	    } else if (input[0].equals("showuserlist")) {
+		getUserList(input);
+
+	    } else if (input[0].equals("getfilelist")) {
+		getFileList(input);
+
+	    } else if (input[0].equals("leave")) {
+		System.out.println("here");
+		n.out.println("leave'#" + n.IPaddress + "'#" + n.openPort);
+	    } else if (!input[0].equalsIgnoreCase("exit")) {
+		System.err.println("Unrecognized command");
+	    }
+	} catch (IOException e) {
 
 	}
 
-	private void addFile(String input) throws IOException {
-		System.out.println("Broadcasting file " + input + " to server");
-		n.out.println("add'#" + input + "'#" + n.IPaddress + "'#" + n.openPort);
-	}
+    }
 
-	private boolean getFile(String input) {
+    private void addFile(String input) throws IOException {
+	System.out.println("Broadcasting file " + input + " to server");
+	n.out.println("add'#" + input + "'#" + n.IPaddress + "'#" + n.openPort);
+    }
 
-		String tInput;
+    private boolean getFile(String input) {
 
-		System.out.println("Requesting file " + input + " from server");
-		n.out.println("get" + "'#" + input);
+	String tInput;
 
-		try {
-			tInput = n.in.readLine();
+	System.out.println("Requesting file " + input + " from server");
+	n.out.println("get" + "'#" + input);
 
-			System.out.println(tInput);
+	try {
+	    tInput = n.in.readLine();
 
-			p.parseClients(f, input, tInput);
+	    System.out.println(tInput);
 
-			boolean retrieved = false;
+	    p.parseClients(f, input, tInput);
 
-			Files toGet = f.findFile(input);
+	    boolean retrieved = false;
 
-			if (toGet.getClientCount() > 0) {
+	    Files toGet = f.findFile(input);
 
-				while (!retrieved || toGet.getClientCount() < toGet.getLoc().size()) {
+	    if (toGet.getClientCount() > 0) {
 
-					Location temp = toGet.getLoc().get(toGet.getClientCount() - 1);
+		while (!retrieved || toGet.getClientCount() < toGet.getLoc().size()) {
 
-					String host = temp.getHostname();
+		    Location temp = toGet.getLoc().get(toGet.getClientCount() - 1);
 
-					int port = temp.getPort();
+		    String host = temp.getHostname();
 
-					try {
+		    int port = temp.getPort();
 
-						Socket s = new Socket(host, port);
+		    try {
 
-						InputStream is = s.getInputStream();
-						OutputStream os = s.getOutputStream();
-						PrintWriter out = new PrintWriter(os, true /* autoflush */);
-						BufferedReader in = new BufferedReader(new InputStreamReader(is));
+			Socket s = new Socket(host, port);
 
-						out.println(input);
+			InputStream is = s.getInputStream();
+			OutputStream os = s.getOutputStream();
+			PrintWriter out = new PrintWriter(os, true /* autoflush */);
+			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 
-						String fileInfo = in.readLine();
+			out.println(input);
 
-						int filesize = Integer.parseInt(fileInfo);
+			String fileInfo = in.readLine();
 
-						byte[] fileArray = new byte[filesize];
+			int filesize = Integer.parseInt(fileInfo);
 
-						File f = new File("" + input + "1");
+			byte[] fileArray = new byte[filesize];
 
-						f.createNewFile();
+			File f = new File("" + input + "1");
 
-						FileOutputStream fos = new FileOutputStream("" + input + "1");
+			f.createNewFile();
 
-						BufferedOutputStream bos = new BufferedOutputStream(fos);
-						int bytesRead;
-						int current = 0;
+			FileOutputStream fos = new FileOutputStream("" + input + "1");
 
-						bytesRead = is.read(fileArray, 0, fileArray.length);
-						current = bytesRead;
+			BufferedOutputStream bos = new BufferedOutputStream(fos);
+			int bytesRead;
+			int current = 0;
 
-						do {
+			bytesRead = is.read(fileArray, 0, fileArray.length);
+			current = bytesRead;
 
-							bytesRead = is.read(fileArray, current, (fileArray.length - current));
-							if (bytesRead >= 0)
-								current += bytesRead;
-						} while (current < filesize);
+			do {
 
-						bos.write(fileArray, 0, current);
-						bos.flush();
-						System.out.println("File " + input + " downloaded (" + current + " bytes read)");
+			    bytesRead = is.read(fileArray, current, (fileArray.length - current));
+			    if (bytesRead >= 0)
+				current += bytesRead;
+			} while (current < filesize);
 
-						s.close();
-						s = null;
-						is.close();
-						is = null;
-						os.close();
-						os = null;
-						out.close();
-						out = null;
-						bos.close();
-						bos = null;
-						fos.close();
-						fos = null;
+			bos.write(fileArray, 0, current);
+			bos.flush();
+			System.out.println("File " + input + " downloaded (" + current + " bytes read)");
 
-						retrieved = true;
+			s.close();
+			s = null;
+			is.close();
+			is = null;
+			os.close();
+			os = null;
+			out.close();
+			out = null;
+			bos.close();
+			bos = null;
+			fos.close();
+			fos = null;
 
-						return true;
+			retrieved = true;
 
-					} catch (IOException e) {
-						System.err.println(e);
-						System.err.println("trying new client");
-						if (!toGet.incrementCount()) {
-							System.err.println("no more clients to connect to");
-							break;
-						}
-							
-					}
-				}
+			return true;
+
+		    } catch (IOException e) {
+			System.err.println(e);
+			System.err.println("trying new client");
+			if (!toGet.incrementCount()) {
+			    System.err.println("no more clients to connect to");
+			    break;
 			}
 
-			return false;
+		    }
 		}
+	    }
 
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-		}
-		return false;
-
+	    return false;
 	}
 
-	private void getUserList(String[] inp) throws IOException {
-		System.out.println("Asking Tracker for user list");
-		n.out.println("show user list");
+	catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    // e.printStackTrace();
 	}
+	return false;
 
-	private void getFileList(String[] inp) throws IOException {
-		System.out.println("Asking Tracker for file list");
-		n.out.println("get file list");
-		
-		String response = n.in.readLine();
-		
-		String [] parsedResponse = response.split("#'");
-		System.out.println("Available files to retrieve:");
-		for ( String x : parsedResponse){
-			System.out.println(x);
-		}
+    }
+
+    private void getUserList(String[] inp) throws IOException {
+	System.out.println("Asking Tracker for user list");
+	n.out.println("show user list");
+	String response = n.in.readLine();
+	System.out.println(response);
+    }
+
+    private void getFileList(String[] inp) throws IOException {
+	System.out.println("Asking Tracker for file list");
+	n.out.println("get file list");
+
+	String response = n.in.readLine();
+
+	if (response != null) {
+	    String[] parsedResponse = response.split("#'");
+	    System.out.println("Available files to retrieve:");
+	    for (String x : parsedResponse) {
+		System.out.println(x);
+	    }
 	}
+    }
 
 }

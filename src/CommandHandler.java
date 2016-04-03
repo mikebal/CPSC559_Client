@@ -40,7 +40,6 @@ public class CommandHandler {
 		getFileList(input);
 
 	    } else if (input[0].equals("leave")) {
-		System.out.println("here");
 		n.out.println("leave'#" + n.IPaddress + "'#" + n.openPort);
 	    } else if (!input[0].equalsIgnoreCase("exit")) {
 		System.err.println("Unrecognized command");
@@ -168,8 +167,11 @@ public class CommandHandler {
     private void getUserList(String[] inp) throws IOException {
 	System.out.println("Asking Tracker for user list");
 	n.out.println("show user list");
-	String response = n.in.readLine();
-	System.out.println(response);
+	String response = "";
+	while (response != null) {
+	    response = n.in.readLine();
+	    System.out.println(response);
+	}
     }
 
     private void getFileList(String[] inp) throws IOException {

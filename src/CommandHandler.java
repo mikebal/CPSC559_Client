@@ -181,10 +181,12 @@ public class CommandHandler {
 	String response = n.in.readLine();
 
 	if (response != null) {
-	    String[] parsedResponse = response.split("#'");
+	    String[] parsedResponse = response.split("'#");
 	    System.out.println("Available files to retrieve:");
+	    int count = 1;
 	    for (String x : parsedResponse) {
-		System.out.println(x);
+		System.out.println(count+". "+x);
+		count++;
 	    }
 	}
     }

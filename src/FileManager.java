@@ -1,3 +1,4 @@
+
 /**
  * @author Richard Game
  * 
@@ -15,7 +16,9 @@ public class FileManager {
     }
 
     /**
-     * adds a new file and all there locations to the files list, if it cant add the file (because it was already there) it returns false otherwise returns true
+     * adds a new file and all there locations to the files list, if it cant add
+     * the file (because it was already there) it returns false otherwise
+     * returns true
      * 
      * @param filename
      * @param loc
@@ -29,22 +32,25 @@ public class FileManager {
 		return false;
 	}
 
-	Files temp = new Files(filename, loc.get(0).getHostname(), loc.get(0).getPort());
+	if (loc.size() > 0) {
+	    Files temp = new Files(filename, loc.get(0).getHostname(), loc.get(0).getPort());
 
-	for (int i = 1; i < loc.size(); i++)
-	    temp.addLocation(loc.get(i).getHostname(), loc.get(i).getPort());
+	    for (int i = 1; i < loc.size(); i++)
+		temp.addLocation(loc.get(i).getHostname(), loc.get(i).getPort());
 
-	file.add(temp);
-	return true;
+	    file.add(temp);
+	    return true;
+	}
+	return false;
     }
 
     /**
-     *  Function to find a file
+     * Function to find a file
      * 
      * @param filename
      * @return
      */
-    
+
     public Files findFile(String filename) {
 	for (Files f : file) {
 	    if (filename.equals(f.getFilename()))

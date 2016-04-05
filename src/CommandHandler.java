@@ -91,6 +91,7 @@ public class CommandHandler {
 	try {
 	    tInput = n.in.readLine();
 
+	    System.out.println(tInput);
 	    
 	    //Parse all the clients the tracker returned
 	    p.parseClients(f, input, tInput);
@@ -100,7 +101,7 @@ public class CommandHandler {
 	    Files toGet = f.findFile(input);
 
 	    //If there were more than zero clients
-	    if (toGet.getClientCount() > 0) {
+	    if ( toGet != null && toGet.getClientCount() > 0) {
 
 		
 		// while the file hasn't been retrieved and not all the clients have been tried

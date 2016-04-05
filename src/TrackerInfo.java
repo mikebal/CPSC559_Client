@@ -1,3 +1,8 @@
+/**
+ * @author Richard Game
+ * 
+ *  Contains everything relating to storing a Trackers information
+ */
 import java.util.ArrayList;
 
 public class TrackerInfo {

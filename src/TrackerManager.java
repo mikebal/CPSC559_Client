@@ -1,3 +1,8 @@
+/**
+ * @author Richard Game
+ * 
+ * Ads and prints out the Trackers information
+ */
 import java.util.ArrayList;
 
 public class TrackerManager {

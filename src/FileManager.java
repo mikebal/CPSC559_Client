@@ -1,3 +1,9 @@
+/**
+ * @author Richard Game
+ * 
+ * Deals with the individual files and adding and retrieving the files 
+ * 
+ */
 import java.util.ArrayList;
 
 public class FileManager {
@@ -8,6 +14,13 @@ public class FileManager {
 	this.file = new ArrayList<Files>();
     }
 
+    /**
+     * adds a new file and all there locations to the files list, if it cant add the file (because it was already there) it returns false otherwise returns true
+     * 
+     * @param filename
+     * @param loc
+     * @return
+     */
     public boolean addFile(String filename, ArrayList<Location> loc) {
 
 	for (int x = 0; x < this.file.size(); x++) {
@@ -25,6 +38,13 @@ public class FileManager {
 	return true;
     }
 
+    /**
+     *  Function to find a file
+     * 
+     * @param filename
+     * @return
+     */
+    
     public Files findFile(String filename) {
 	for (Files f : file) {
 	    if (filename.equals(f.getFilename()))

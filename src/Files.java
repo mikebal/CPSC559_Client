@@ -1,3 +1,8 @@
+/**
+ * @author Richard Game
+ * 
+ * File relating to everything for files, including how many clients own a file and all there hostname and port information 
+ */
 import java.util.ArrayList;
 
 public class Files {

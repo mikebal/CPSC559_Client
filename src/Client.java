@@ -1,3 +1,9 @@
+/**
+ *  @author Richard Game
+ *  
+ *  Main entry point for the Client program; it creates a client server, connects to the redirect server, 
+ *  gets user's decision, and then loops commands over the tracker server until a user explicitly says they aren't
+ */
 import java.io.*;
 import java.util.*;
 
@@ -16,6 +22,7 @@ public class Client {
 	
 	do {
 	    try {
+		//Connects to the Redirect Server
 		nm.connect(args[0], Integer.parseInt(args[1]));
 
 		tm = null;
@@ -24,8 +31,10 @@ public class Client {
 
 		nm.out.println("New client");
 
+		//Reads in the list of trackers from the redirect server
 		String trackerServerList = nm.in.readLine();
 
+		//Parses the list
 		parse.parseTracker(tm, trackerServerList);
 
 		nm.closeConnection();
@@ -40,8 +49,11 @@ public class Client {
 		int userChoice = Integer.parseInt(userLine);
 		userChoice--;
 
+		//Chooses the appropriate tracker for user input 
 		TrackerInfo choice = tm.getTrackers().get(userChoice);
 		boolean firstConnection = true;
+		
+		//Until user types in leave or exit, loop
 		do {
 		    try {
 
@@ -52,7 +64,7 @@ public class Client {
 
 			
 			
-
+			// on a new connection, notify tracker that its a new client
 			if (firstConnection) {
 			    nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 			    nm.out.println("new'#"+nm.IPaddress + "'#" + nm.openPort+"'#");
@@ -82,6 +94,7 @@ public class Client {
 
 			String[] input = userLine.split(" ");
 
+			//Connect to the Tracker and handle the user input along with the server response
 			nm.connect(cached.getTrackerHost(), cached.getTrackerPort());
 			
 			ch.handleCommand(input);
@@ -91,7 +104,7 @@ public class Client {
 			}
 			
 		
-
+			// Error checking to see if there is a socket issue connecting with the tracker
 		    } catch (IOException ioe) {
 			System.err.println("Couldn't connect to tracker, trying next in group");
 			if (!choice.incrementCount()) {

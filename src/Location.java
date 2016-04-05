@@ -1,4 +1,10 @@
-
+/**
+ * 
+ * @author Richard Game
+ *
+ * All related information for the Location of a client
+ *
+ */
 public class Location {
     private String hostName;
     private int port;

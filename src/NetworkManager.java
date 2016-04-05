@@ -1,3 +1,10 @@
+/** 
+ * @author Richard Game
+ * 
+ *  Creates a socket for a client connecting to another client and a client connecting to a the trackers and redirect
+ *  
+ *  Also handled reading and writing to those sockets and cleaning up as much as it can
+ */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

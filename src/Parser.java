@@ -1,3 +1,8 @@
+/**
+ * @author Richard Game
+ * 
+ *  Related to parsing the information the redirect and the client receives
+ */
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -9,7 +14,15 @@ public class Parser {
 	public Parser() {
 
 	}
-
+	
+	/**
+	 * Parses the trackers received by the redirect
+	 * 
+	 * @param tm
+	 * @param input
+	 *
+	 *
+	 */
 	public void parseTracker(TrackerManager tm, String input){
 
 		String[] parsedRedirectInput = input.split(ARGUMENTSEPERATOR);
@@ -59,6 +72,13 @@ public class Parser {
 		}
 	}
 
+	/**
+	 *  Parses the clients received by the tracker when a client requests a file and stores that information
+	 * 
+	 * @param fm
+	 * @param filename
+	 * @param UserLoc
+	 */
 	public void parseClients(FileManager fm, String filename, String UserLoc) {
 
 		try {

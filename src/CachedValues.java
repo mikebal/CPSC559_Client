@@ -1,4 +1,13 @@
-
+/**
+ * 
+ * @author Richard Game
+ *
+ *	This is a class that holds the most up-to-date values for when a person has succesfully connected to the
+ *redirect server along with the tracker servers. 
+ *
+ *On a new succesful connection these values get updated
+ *
+ */
 public class CachedValues {
 
     private String redirectHost;
